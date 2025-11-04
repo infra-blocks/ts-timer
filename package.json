@@ -1,16 +1,17 @@
 {
-  "name": "@infra-blocks/lib-template",
+  "name": "@infra-blocks/timer",
   "version": "0.0.0",
-  "description": "This repository is a template to generate repositories meant to hold the source code of NPM packages written in TypeScript.",
+  "description": "This package holds utilities relating to timers and intervals.",
   "keywords": [
-    "template",
+    "timer",
+    "interval",
     "typescript",
     "esm",
     "cjs"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/infra-blocks/ts-lib-template.git"
+    "url": "https://github.com/infra-blocks/ts-timer.git"
   },
   "license": "ISC",
   "author": "",
