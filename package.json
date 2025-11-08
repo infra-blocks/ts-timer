@@ -51,10 +51,12 @@
     "lefthook": "^1.11.16",
     "mocha": "^11.7.1",
     "tsx": "^4.20.6",
-    "typed-emitter": "^2.1.0",
     "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@infra-blocks/emitter": "^0.1.0"
   }
 }
