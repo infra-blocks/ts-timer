@@ -1,5 +1,4 @@
-import EventEmitter from "node:events";
-import type * as TypedEmitter from "typed-emitter";
+import { type EmitterLike, EmitterLikeBase } from "@infra-blocks/emitter";
 
 export type TimerEvents = {
   /**
@@ -19,7 +18,7 @@ export type TimerEvents = {
  * It is equivalent to canceling the timer, then starting it anew and has no special
  * semantics.
  */
-export interface Timer {
+export interface Timer extends EmitterLike<TimerEvents> {
   /**
    * Starts the timer.
    *
@@ -39,26 +38,16 @@ export interface Timer {
    * Effectively equivalent to calling `cancel()` followed by `start()`.
    */
   restart(): this;
-  /**
-   * Subscribes to timer events.
-   *
-   * @param event - The event name.
-   * @param listener - The event listener callback.
-   *
-   * @see TimerEvents
-   */
-  on<K extends keyof TimerEvents>(event: K, listener: TimerEvents[K]): this;
 }
 
-class TimerImpl implements Timer {
+class TimerImpl extends EmitterLikeBase<TimerEvents> implements Timer {
   private readonly milliseconds: number;
-  private readonly emitter: TypedEmitter.default<TimerEvents>;
   private handle?: NodeJS.Timeout;
 
   constructor(params: { milliseconds: number }) {
+    super();
     const { milliseconds } = params;
     this.milliseconds = milliseconds;
-    this.emitter = new EventEmitter() as TypedEmitter.default<TimerEvents>;
   }
 
   start(): this {
@@ -67,7 +56,7 @@ class TimerImpl implements Timer {
       return this;
     }
     this.handle = setTimeout(() => {
-      this.emitter.emit("timeout");
+      this.emit("timeout");
     }, this.milliseconds);
     return this;
   }
@@ -77,7 +66,7 @@ class TimerImpl implements Timer {
     if (this.handle == null) {
       return this;
     }
-    clearInterval(this.handle);
+    clearTimeout(this.handle);
     this.handle = undefined;
     return this;
   }
@@ -85,11 +74,6 @@ class TimerImpl implements Timer {
   restart(): this {
     this.cancel();
     return this.start();
-  }
-
-  on<K extends keyof TimerEvents>(event: K, listener: TimerEvents[K]): this {
-    this.emitter.on(event, listener);
-    return this;
   }
 }
 
