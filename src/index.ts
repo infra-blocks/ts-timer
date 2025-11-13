@@ -56,6 +56,7 @@ class TimerImpl extends EmitterLikeBase<TimerEvents> implements Timer {
       return this;
     }
     this.handle = setTimeout(() => {
+      this.handle = undefined;
       this.emit("timeout");
     }, this.milliseconds);
     return this;

@@ -1,4 +1,5 @@
 import { expect, sinon } from "@infra-blocks/test";
+import { injectFakeTimersFixtures } from "@infra-blocks/test/mocha/bdd";
 import { timer } from "../../src/index.js";
 
 declare module "mocha" {
@@ -8,13 +9,7 @@ declare module "mocha" {
 }
 
 describe("timer", () => {
-  before(function () {
-    this.clock = sinon.useFakeTimers();
-  });
-
-  after(function () {
-    this.clock.restore();
-  });
+  injectFakeTimersFixtures();
 
   it("should dispatch to the callback at the proper time ", function () {
     const handler = sinon.fake();
@@ -24,7 +19,7 @@ describe("timer", () => {
     this.clock.tick(1);
     expect(handler).to.have.been.calledOnce;
   });
-  it("should do handle double starts as if it had been called only once", function () {
+  it("should handle double starts as if it had been called only once", function () {
     const handler = sinon.fake();
     const t = timer(100).on("timeout", handler).start();
     this.clock.tick(90);
@@ -36,11 +31,20 @@ describe("timer", () => {
     // Still called only once.
     expect(handler).to.have.been.calledOnce;
   });
+  it("should treat a start after an expiration as a restart", function () {
+    const handler = sinon.fake();
+    const t = timer(100).on("timeout", handler).start();
+    this.clock.tick(100);
+    expect(handler).to.have.been.calledOnce;
+    t.start();
+    this.clock.tick(100);
+    expect(handler).to.have.been.calledTwice;
+  });
   it("should treat cancellation as a no-op when not started", () => {
     // It's not throwing.
     timer(100).cancel();
   });
-  it("should prevent the timeout callback when cancelled", function () {
+  it("should prevent the timeout callback from being called when cancelled", function () {
     const handler = sinon.fake();
     const t = timer(100).on("timeout", handler).start();
     this.clock.tick(50);

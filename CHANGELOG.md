@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-11-13
+
+### Fixed
+
+- Now clear inner state when timer expires. The code was previously keeping the handle
+set until `cancel` or `restart` were called. Because the handle is a timer object that can
+potentially hold a great amount of memory, it should be aggressively cleaned up. Not only
+that, but it makes sense to be able to call `start` again after a timer has expired.
+
 ## [0.2.0] - 2025-11-08
 
 ### Added
